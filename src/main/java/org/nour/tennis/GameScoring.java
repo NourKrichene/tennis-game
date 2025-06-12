@@ -14,45 +14,40 @@ public class GameScoring {
             return "Invalid input : must be not empty and contain only A or B";
         }
 
-        int[] playersPoints = new int[]{0, 0};
+        int[] score = new int[2];
         StringBuilder result = new StringBuilder();
-        boolean deuce = false;
         int i = 0;
 
         while (i < input.length()) {
 
-            if (deuce) {
-                result.append(PLAYER).append(input.charAt(i)).append(" Advantage").append(System.lineSeparator());
-                i++;
-                if (input.charAt(i) != input.charAt(i - 1)) {
-                    result.append(DEUCE).append(System.lineSeparator());
-                    i++;
-                    continue;
-                }
-                if (input.charAt(i) == input.charAt(i - 1)) {
-                    result.append(PLAYER).append(input.charAt(i)).append(WINS_THE_GAME);
-                    return result.toString();
-                }
-            }
+            char currentPlayer = input.charAt(i);
+            int playerIndex = currentPlayer - 'A';
+            score[playerIndex]++;
 
-            int playerIndex = input.charAt(i) - 'A';
-            playersPoints[playerIndex]++;
-
-            if (playersPoints[playerIndex] == POINTS_TO_WIN_IN_NO_DEUCE) {
-                result.append(PLAYER).append(input.charAt(i)).append(WINS_THE_GAME);
+            if (score[playerIndex] == POINTS_TO_WIN_IN_NO_DEUCE) {
+                result.append(PLAYER).append(currentPlayer).append(WINS_THE_GAME);
                 return result.toString();
             }
+            if (score[0] == POINTS_TO_REACH_DEUCE && score[0] == score[1]) {
+                i++;
+                break;
+            }
+            result.append(PLAYER).append("A : ").append(POINTS[score[0]]).append(" / ").append(PLAYER).append("B : ").append(POINTS[score[1]]).append(System.lineSeparator());
+            i++;
+        }
 
-            if (playersPoints[0] == POINTS_TO_REACH_DEUCE && playersPoints[0] == playersPoints[1]) {
-                deuce = true;
+        if (i == input.length()) return result.toString();
+        result.append(DEUCE).append(System.lineSeparator());
+        while (i < input.length()) {
+            result.append(PLAYER).append(input.charAt(i)).append(" Advantage").append(System.lineSeparator());
+            i++;
+            if (input.charAt(i) != input.charAt(i - 1)) {
                 result.append(DEUCE).append(System.lineSeparator());
                 i++;
                 continue;
             }
-
-            result.append(PLAYER).append("A : ").append(POINTS[playersPoints[0]]).append(" / ")
-                    .append(PLAYER).append("B : ").append(POINTS[playersPoints[1]]).append(System.lineSeparator());
-            i++;
+            result.append(PLAYER).append(input.charAt(i)).append(WINS_THE_GAME);
+            return result.toString();
         }
         return result.toString();
     }
