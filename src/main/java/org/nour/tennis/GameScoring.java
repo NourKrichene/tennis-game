@@ -9,48 +9,63 @@ public class GameScoring {
     private static final int[] POINTS = new int[]{0, 15, 30, 40};
     private static final int POINTS_TO_WIN_IN_NO_DEUCE = 4;
     private static final int POINTS_TO_REACH_DEUCE = 3;
+    private static final int DEUCE_START_POINT = 6;
+    static boolean isDeuce = false;
 
     public static String gameScoring(String input) {
+
         if (input == null || !input.matches("[AB]+")) {
             return "Invalid input : must be not empty and contain only A or B";
         }
 
+        StringBuilder scoreLines = computeGameScore(input);
+
+        if (isDeuce) {
+            scoreLines.append(computeGameScoreWithDeuce(input));
+        }
+
+        return scoreLines.toString();
+    }
+
+    private static StringBuilder computeGameScore(String input) {
+        int i = 0;
         int[] score = new int[2];
         StringBuilder result = new StringBuilder();
-        int i = 0;
-
         while (i < input.length()) {
-
             char currentPlayer = input.charAt(i);
             int playerIndex = currentPlayer - 'A';
             score[playerIndex]++;
 
             if (isWinPointReached(score[playerIndex])) {
-                return writeWinnerLine(result, currentPlayer);
+                result.append(writeWinnerLine(currentPlayer));
+                break;
             }
             if (isDeuceReached(score)) {
-                i++;
+                isDeuce = true;
                 break;
             }
             result.append(writeScoreLine(score));
             i++;
         }
+        return result;
+    }
 
-        if (i == input.length()) return result.toString();
-
-        writeDeuceLine(result);
-
+    private static StringBuilder computeGameScoreWithDeuce(String input) {
+        StringBuilder result = new StringBuilder();
+        result.append(writeDeuceLine());
+        int i = DEUCE_START_POINT;
         while (i < input.length()) {
             result.append(writeAdvantageLine(input.charAt(i)));
             i++;
             if (input.charAt(i) != input.charAt(i - 1)) {
-                writeDeuceLine(result);
+                result.append(writeDeuceLine());
                 i++;
                 continue;
             }
-            return writeWinnerLine(result, input.charAt(i));
+            result.append(writeWinnerLine(input.charAt(i)));
+            return result;
         }
-        return result.toString();
+        return result;
     }
 
 
@@ -62,22 +77,21 @@ public class GameScoring {
         return score[0] == POINTS_TO_REACH_DEUCE && score[0] == score[1];
     }
 
+    private static String writeScoreLine(int[] score) {
+        return String.format("Player A : %d / Player B : %d%s", POINTS[score[0]], POINTS[score[1]], NEW_LINE);
+    }
 
-    private static void writeDeuceLine(StringBuilder result) {
-        result.append(DEUCE).append(NEW_LINE);
+    private static String writeWinnerLine(char currentPlayer) {
+        return PLAYER + currentPlayer + WINS_THE_GAME;
+    }
+
+
+    private static String writeDeuceLine() {
+        return DEUCE + NEW_LINE;
     }
 
     private static String writeAdvantageLine(char currentPlayer) {
         return PLAYER + currentPlayer + " Advantage" + NEW_LINE;
-    }
-
-    private static String writeWinnerLine(StringBuilder result, char currentPlayer) {
-        result.append(PLAYER).append(currentPlayer).append(WINS_THE_GAME);
-        return result.toString();
-    }
-
-    private static String writeScoreLine(int[] score) {
-        return PLAYER + "A : " + POINTS[score[0]] + " / " + PLAYER + "B : " + POINTS[score[1]] + NEW_LINE;
     }
 
 }
