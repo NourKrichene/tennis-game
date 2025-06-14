@@ -48,17 +48,16 @@ public class GameScoreEvaluator {
     private static String computeDeuceGameScore(String playersPointsWinHistory) {
         StringBuilder scoreLines = new StringBuilder(writeDeuceLine());
         int i = DEUCE_START_POINT;
-        while (i < playersPointsWinHistory.length()) {
+        while (i < playersPointsWinHistory.length() - 1) {
             char currentPlayer = playersPointsWinHistory.charAt(i);
             scoreLines.append(writeAdvantageLine(currentPlayer));
             i++;
-            if (!twoConsecutivePointsWon(playersPointsWinHistory, i)) {
-                scoreLines.append(writeDeuceLine());
-                i++;
-                continue;
+            if (twoConsecutivePointsWon(playersPointsWinHistory, i)) {
+                scoreLines.append(writeWinnerLine(currentPlayer));
+                return scoreLines.toString();
             }
-            scoreLines.append(writeWinnerLine(currentPlayer));
-            return scoreLines.toString();
+            scoreLines.append(writeDeuceLine());
+            i++;
         }
         return scoreLines.toString();
     }
