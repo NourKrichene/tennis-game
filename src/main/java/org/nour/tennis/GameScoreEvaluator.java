@@ -25,22 +25,25 @@ public class GameScoreEvaluator {
     }
 
     private static PreDeuceGameScore computePreDeuceGameScore(String playersPointsWinHistory) {
-        int i = 0;
         int[] playersPoints = new int[2];
         StringBuilder scoreLines = new StringBuilder();
-        while (i < playersPointsWinHistory.length()) {
+
+        for (int i = 0; i < playersPointsWinHistory.length(); i++) {
             char currentPlayer = playersPointsWinHistory.charAt(i);
             int currentPlayerPoints = ++playersPoints[currentPlayer - 'A'];
+
             if (isWinPointReached(currentPlayerPoints)) {
                 scoreLines.append(writeWinnerLine(currentPlayer));
-                break;
+                return new PreDeuceGameScore(scoreLines.toString(), false);
             }
+
             if (isDeuceReached(playersPoints)) {
                 return new PreDeuceGameScore(scoreLines.toString(), true);
             }
+
             scoreLines.append(writeScoreLine(playersPoints));
-            i++;
         }
+
         return new PreDeuceGameScore(scoreLines.toString(), false);
     }
 
@@ -48,17 +51,21 @@ public class GameScoreEvaluator {
     private static String computeDeuceGameScore(String playersPointsWinHistory) {
         StringBuilder scoreLines = new StringBuilder(writeDeuceLine());
         int i = DEUCE_START_POINT;
+
         while (i < playersPointsWinHistory.length() - 1) {
             char currentPlayer = playersPointsWinHistory.charAt(i);
             scoreLines.append(writeAdvantageLine(currentPlayer));
             i++;
+
             if (twoConsecutivePointsWon(playersPointsWinHistory, i)) {
                 scoreLines.append(writeWinnerLine(currentPlayer));
                 return scoreLines.toString();
             }
+
             scoreLines.append(writeDeuceLine());
             i++;
         }
+
         return scoreLines.toString();
     }
 
