@@ -15,16 +15,21 @@ public class ScoreWriterUtil {
         for (int i = 0; i < score.length(); i += 2) {
             char firstSymbol = score.charAt(i);
             char secondSymbol = score.charAt(i + 1);
-
-            scoreLines.append(switch (secondSymbol) {
-                case ADVANTAGE -> writeAdvantageLine(firstSymbol);
-                case DEUCE -> writeDeuceLine();
-                case WIN -> writeWinnerLine(firstSymbol);
-                default -> writeScoreLine(POINTS[firstSymbol - '0'], POINTS[secondSymbol - '0']);
-            });
-
+            scoreLines.append(formatPair(firstSymbol, secondSymbol));
         }
+
         return scoreLines.toString();
+    }
+
+    private static String formatPair(char firstSymbol, char secondSymbol) {
+        return switch (secondSymbol) {
+            case ADVANTAGE -> writeAdvantageLine(firstSymbol);
+            case DEUCE -> writeDeuceLine();
+            case WIN -> writeWinnerLine(firstSymbol);
+            default ->
+                    writeScoreLine(POINTS[Character.getNumericValue(firstSymbol)],
+                            POINTS[Character.getNumericValue(secondSymbol)]);
+        };
     }
 
     private static String writeScoreLine(int pointsPlayerA, int pointsPlayerB) {
