@@ -9,7 +9,6 @@ public class GameScoreEvaluator {
     private static final String INVALID_INPUT_MESSAGE = "Invalid input : must be not empty and contain only A or B";
 
     public static String computeGameScore(String playersPointsWinHistory) {
-
         if (!isValid(playersPointsWinHistory)) {
             return INVALID_INPUT_MESSAGE;
         }
@@ -26,7 +25,7 @@ public class GameScoreEvaluator {
 
     private static PreDeuceGameScore computePreDeuceGameScore(String playersPointsWinHistory) {
         int[] playersPoints = new int[2];
-        StringBuilder scoreLines = new StringBuilder();
+        var scoreLines = new StringBuilder();
 
         for (int i = 0; i < playersPointsWinHistory.length(); i++) {
             char currentPlayer = playersPointsWinHistory.charAt(i);
@@ -47,15 +46,18 @@ public class GameScoreEvaluator {
         return new PreDeuceGameScore(scoreLines.toString(), false);
     }
 
-
     private static String computeDeuceGameScore(String playersPointsWinHistory) {
-        StringBuilder scoreLines = new StringBuilder(writeDeuceLine());
-        int i = DEUCE_START_POINT;
+        var scoreLines = new StringBuilder(writeDeuceLine());
+        boolean isPreviousPointDeuce = true;
 
-        while (i < playersPointsWinHistory.length() - 1) {
+        for (int i = DEUCE_START_POINT; i < playersPointsWinHistory.length(); i++) {
             char currentPlayer = playersPointsWinHistory.charAt(i);
-            scoreLines.append(writeAdvantageLine(currentPlayer));
-            i++;
+
+            if (isPreviousPointDeuce) {
+                scoreLines.append(writeAdvantageLine(currentPlayer));
+                isPreviousPointDeuce = false;
+                continue;
+            }
 
             if (twoConsecutivePointsWon(playersPointsWinHistory, i)) {
                 scoreLines.append(writeWinnerLine(currentPlayer));
@@ -63,14 +65,12 @@ public class GameScoreEvaluator {
             }
 
             scoreLines.append(writeDeuceLine());
-            i++;
+            isPreviousPointDeuce = true;
         }
 
         return scoreLines.toString();
     }
 
-
     private record PreDeuceGameScore(String scoreLines, boolean isDeuceReached) {
     }
-
 }
